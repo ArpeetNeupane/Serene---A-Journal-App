@@ -1,0 +1,166 @@
+﻿@page "/signup"
+@inject ThemeService ThemeService
+@inject ILoggerService LoggerService
+@inject IAuthService AuthService
+@inject ToastService Toast
+@inject NavigationManager Nav
+@layout Layout.AuthLayout
+
+<div class="signup-page @GetThemeClass()">
+    <div class="signup-bg-blur"></div>
+
+    <button class="theme-toggle-fixed" @onclick="ToggleTheme" aria-label="Toggle theme">
+        <img class="theme-icon"
+             src="@($"assets/icons/{(ThemeService.GetCurrentTheme() == ThemeService.Theme.Light ? "sun.svg" : "moon.svg")}")"
+             alt="Theme toggle" />
+    </button>
+
+    <div class="signup-container">
+        <div class="signup-card">
+            <div class="logo-section">
+                <img src="assets/app_logos/logo.svg" alt="Serene" class="app-logo" />
+            </div>
+
+            <h1 class="welcome-title">Create Account</h1>
+            <p class="welcome-subtitle">Please fill in the details to sign up</p>
+
+            <form @onsubmit="SignUpUser" class="signup-form">
+                <div class="form-field">
+                    <input type="text"
+                           name="username"
+                           id="username"
+                           @bind="username"
+                           placeholder="Username"
+                           class="form-input"
+                           autocomplete="new-password" />
+                </div>
+
+                <div class="form-field">
+                    <div class="input-with-toggle">
+                        <input type="@(showPin ? "text" : "password")"
+                               name="pin"
+                               id="pin"
+                               @bind="pin"
+                               placeholder="PIN (6 digits)"
+                               maxlength="6"
+                               class="form-input" 
+                               autocomplete="new-password" />
+                        <button type="button" class="toggle-pin-btn" @onclick="() => showPin = !showPin">
+                            @(showPin ? "Hide" : "Show")
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <div class="input-with-toggle">
+                        <input type="@(showConfirmPin ? "text" : "password")"
+                               name="confirmPin"
+                               id="confirmPin"
+                               @bind="confirmPin"
+                               placeholder="Confirm PIN"
+                               maxlength="6"
+                               class="form-input" 
+                               autocomplete="new-password" />
+                        <button type="button" class="toggle-pin-btn" @onclick="() => showConfirmPin = !showConfirmPin">
+                            @(showConfirmPin ? "Hide" : "Show")
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <div class="input-with-toggle">
+                        <input type="@(showJournalPin ? "text" : "password")"
+                               name="journalPin"
+                               id="journalPin"
+                               @bind="journalPin"
+                               placeholder="Journal PIN"
+                               maxlength="6"
+                               class="form-input" />
+                        <button type="button" class="toggle-pin-btn" @onclick="() => showJournalPin = !showJournalPin">
+                            @(showJournalPin ? "Hide" : "Show")
+                        </button>
+                    </div>
+                </div>
+
+
+                <button type="submit" class="signup-btn">Sign Up</button>
+            </form>
+
+            <NavLink class="login-link" href="/login" Match="NavLinkMatch.All">
+                <span class="login-link-text">Already have an account? Login</span>
+            </NavLink>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string username = string.Empty;
+    private string pin = string.Empty;
+    private string confirmPin = string.Empty;
+    private string journalPin = string.Empty;
+
+    private bool showPin;
+    private bool showConfirmPin;
+    private bool showJournalPin;
+
+    private void ToggleTheme() => ThemeService.ToggleTheme();
+
+    private string GetThemeClass() =>
+        ThemeService.GetCurrentTheme() == ThemeService.Theme.Light ? "light-theme" : "dark-theme";
+
+    private async Task SignUpUser()
+    {
+        //validating non-empty fields
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(pin) || string.IsNullOrWhiteSpace(confirmPin) || string.IsNullOrWhiteSpace(journalPin))
+        {
+            Toast.Error("Please fill in all the fields.");
+            return;
+        }
+
+        //validating numeric PIN
+        if (!pin.All(char.IsDigit) || pin.Length is not 6 || !journalPin.All(char.IsDigit) || journalPin.Length is not 6)
+    {
+            Toast.Error("PIN must be numeric and 6 digits long.");
+            return;
+        }
+
+        //validating PIN match
+        if (pin != confirmPin)
+        {
+            Toast.Error("PINs do not match.");
+            return;
+        }
+
+        //validating journal PIN
+        if ((!journalPin.All(char.IsDigit) || journalPin.Length is not 6))
+        {
+            Toast.Error("Journal PIN must be numeric and 6 digits long.");
+            return;
+        }
+
+        Toast.Info("Please wait while we create the account.");
+        await Task.Delay(800);
+        var result = await AuthService.SignUp(username, pin, journalPin);
+
+        if (result.Success)
+        {
+            Toast.Success("Account created successfully!");
+            await Task.Delay(500);
+            Nav.NavigateTo("/login");
+        }
+        else
+        {
+            Toast.Error($"Sign up failed: {result.ErrorMessage ?? "Unknown error"}");
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        ThemeService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnChange -= StateHasChanged;
+    }
+}

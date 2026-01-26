@@ -1,0 +1,194 @@
+﻿/*#if (SampleContent)*/
+:root {
+    --bg: white;
+    --text: black;
+    --primary: #4E54C8;
+    --primary-rgb: 78, 84, 200;
+    --selected-tab: #3326BE;
+    --gradient_bg: linear-gradient(29.864deg, #4E54C8 38%, #8F94FB 75%);
+    --radial-gradient-bg: radial-gradient( circle, #4E54C8 0%, #8F94FB 68% );
+    --hovered-tab: #1E4B9B;
+    --hover-bg: #F0F0F0;
+    --theme-selector-active-bg: rgba(78, 84, 200, 0.7);
+    --dialog: #FFFFFF;
+}
+
+html, body, .page {
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+
+.blazor-error-boundary {
+    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: white;
+}
+
+    .blazor-error-boundary::after {
+        content: "An error has occurred."
+    }
+
+.status-bar-safe-area {
+    display: none;
+}
+
+@supports (-webkit-touch-callout: none) {
+    .status-bar-safe-area {
+        display: flex;
+        position: sticky;
+        top: 0;
+        height: env(safe-area-inset-top);
+        background-color: #f7f7f7;
+        width: 100%;
+        z-index: 1;
+    }
+
+    .flex-column, .navbar-brand {
+        padding-left: env(safe-area-inset-left);
+    }
+}
+
+/* Theme Data */
+.theme-light {
+    --bg: #FFFFFF;
+    --text: #000000;
+    --hover-bg: #F0F0F0;
+    --dialog: #FFFFFF;
+}
+
+.theme-dark {
+    --bg: #2F2E2E;
+    --text: #FFFFFF;
+    --hover-bg: #444444;
+    --dialog: #2F2E2E;
+}
+
+/* Accent Data */
+.accent-default {
+    --primary: #4E54C8;
+    --primary-rgb: 78, 84, 200;
+    --gradient_bg: linear-gradient(29.864deg, #4E54C8 38%, #8F94FB 75%);
+    --radial-gradient-bg: radial-gradient( circle, #4E54C8 0%, #8F94FB 68% );
+    --selected-tab: #034596;
+    --hovered-tab: #1E4B9B;
+    --theme-selector-active-bg: rgba(78, 84, 200, 0.7);
+}
+
+.accent-peach {
+    --primary: #FF7E5F;
+    --primary-rgb: 255, 126, 95;
+    --gradient_bg: linear-gradient(29.864deg, #FF7E5F 47%, #FFDAB9 87%);
+    --radial-gradient-bg: radial-gradient( circle, #FF7E5F 20%, #FFDAB9 100% );
+    --selected-tab: #FB6743;
+    --hovered-tab: #FF8B65;
+    --theme-selector-active-bg: rgba(255, 126, 95, 0.7);
+}
+
+.accent-ocean {
+    --primary: #0072FF;
+    --primary-rgb: 0, 114, 255;
+    --gradient_bg: linear-gradient(29.864deg, #00C6FF 38%, #0072FF 75%);
+    --radial-gradient-bg: radial-gradient( circle, #00C6FF 18%, #0072FF 83% );
+    --selected-tab: #034596;
+    --hovered-tab: #FF7E5F;
+    --theme-selector-active-bg: rgba(0, 114, 255, 0.7);
+}
+
+.accent-sunset {
+    --primary: #FF5F6D;
+    --primary-rgb: 255, 95, 109;
+    --gradient_bg: linear-gradient(29.864deg, #FF5F6D 18%, #FFC371 75%);
+    --radial-gradient-bg: radial-gradient( circle, #FF5F6D 18%, #FFC371 100% );
+    --selected-tab: #EC3747;
+    --hovered-tab: #F14A55;
+    --theme-selector-active-bg: rgba(255, 95, 109, 0.7);
+}
+
+/* Actual styles following theme and accent */
+.text-primary {
+    color: var(--primary);
+}
+
+.text-theme {
+    color: var(--text);
+}
+
+bg-theme {
+    background: var(--bg);
+}
+
+.bg-accent {
+    background: var(--gradient_bg);
+}
+
+.bg-primary {
+    background: var(--primary);
+}
+
+.bg-accent-radial {
+    background: var(--radial-gradient-bg);
+}
+
+.bg-dialog {
+    background: var(--dialog);
+}
+
+.selected-tab {
+    background: var(--selected-tab);
+}
+
+/* Override css classes using tailwind like structure */
+.px-3 {
+    padding-left: 0.75rem; /* 12px */
+    padding-right: 0.75rem; /* 12px */
+}
+
+/* Quill toolbar icons */
+.ql-toolbar button svg .ql-stroke,
+.ql-toolbar .ql-picker-label svg .ql-stroke {
+    stroke: var(--text);
+}
+
+.ql-toolbar button svg .ql-fill,
+.ql-toolbar .ql-picker-label svg .ql-fill {
+    fill: var(--text);
+}
+
+/* Selected heading text */
+.ql-toolbar .ql-picker-label {
+    color: var(--text);
+}
+
+.ql-snow.ql-toolbar .ql-picker-options,
+.ql-snow .ql-toolbar .ql-picker-options {
+    background-color: var(--bg);
+}
+
+.ql-snow .ql-picker-options .ql-picker-item {
+    color: var(--text);
+}
+
+

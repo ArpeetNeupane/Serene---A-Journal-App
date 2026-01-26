@@ -1,0 +1,76 @@
+﻿@inject ThemeService ThemeService
+@inject ILoggerService LoggerService
+@inject IAuthService AuthService
+@* @using Serene.Components.Shared *@
+
+<div class="nav-scrollable" style="height: calc(100% - 20px); padding-top: 20px">
+    <nav style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <img class="logo px-3" src="assets/app_logos/logo.svg" alt="Logo" />
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/dashboard" Match="NavLinkMatch.All">
+                    <img class="nav-item-img" src="assets/icons/dashboard.svg" />
+                    <span class="nav-item-text">Dashboard</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/daily_journal">
+                    <img class="nav-item-img" src="assets/icons/journal.svg" />
+                    <span class="nav-item-text">Daily Journal</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/timeline">
+                    <img class="nav-item-img" src="assets/icons/timeline.svg" />
+                    <span class="nav-item-text">Timeline</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/calender">
+                    <img class="nav-item-img" src="assets/icons/calender.svg" />
+                    <span class="nav-item-text">Calender</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/custom_tags">
+                    <img class="nav-item-img" src="assets/icons/tags.svg" />
+                    <span class="nav-item-text">Add Tags</span>
+                </NavLink>
+            </div>
+        </div>
+
+        <div class="user-profile px-3">
+            <div class="user-avatar">
+                @Utils.GetInitials(CurrentUser?.Username ?? "")
+            </div>
+
+            <span class="user-name">
+                @(CurrentUser?.Username ?? "")
+            </span>
+
+            <button class="theme-toggle" @onclick="ToggleTheme" aria-label="Toggle theme">
+                <img class="theme-icon"
+                     src="@($"assets/icons/{(ThemeService.GetCurrentTheme() == ThemeService.Theme.Light ? "sun.svg" : "moon.svg")}")" />
+            </button>
+        </div>
+    </nav>
+</div>
+
+@code {
+    UserViewModel? CurrentUser;
+
+    protected override void OnInitialized()
+    {
+        CurrentUser = AuthService.GetCurrentUser();
+    }
+
+    private void ToggleTheme()
+    {
+        ThemeService.ToggleTheme();
+    }
+}

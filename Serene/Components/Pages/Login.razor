@@ -1,0 +1,151 @@
+﻿@page "/login"
+
+@inject ThemeService ThemeService
+@inject ILoggerService LoggerService
+@inject IAuthService AuthService
+@inject ToastService Toast
+@inject NavigationManager Nav
+
+@layout Layout.AuthLayout
+
+<div class="login-page @GetThemeClass()">
+    <div class="login-bg-blur"></div>
+    
+    <button class="theme-toggle-fixed" @onclick="ToggleTheme" aria-label="Toggle theme">
+        <img class="theme-icon"
+             src="@($"assets/icons/{(ThemeService.GetCurrentTheme() == ThemeService.Theme.Light ? "sun.svg" : "moon.svg")}")"
+             alt="Theme toggle" />
+    </button>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-section">
+                <img src="assets/app_logos/logo.svg" alt="Serene" class="app-logo" />
+            </div>
+
+            <h1 class="welcome-title">Welcome Back</h1>
+            <p class="welcome-subtitle">Please enter your username and PIN to continue</p>
+
+            <form @onsubmit="LoginUser" class="login-form">
+                <div class="form-field">
+                    <input type="text" 
+                           name="username" 
+                           id="username" 
+                           @bind="username" 
+                           placeholder="Username"
+                           class="username-input" />
+                </div>
+
+                <div class="pin-indicators">
+                    @for (int i = 0; i < 6; i++)
+                    {
+                        <span class="pin-dot @(pin.Length > i ? "filled" : "")"></span>
+                    }
+                </div>
+
+                <div class="pin-pad">
+                    <button type="button" class="pin-btn" @onclick="() => AddPin('1')">1</button>
+                    <button type="button" class="pin-btn" @onclick="() => AddPin('2')">2</button>
+                    <button type="button" class="pin-btn" @onclick="() => AddPin('3')">3</button>
+                    
+                    <button type="button" class="pin-btn" @onclick="() => AddPin('4')">4</button>
+                    <button type="button" class="pin-btn" @onclick="() => AddPin('5')">5</button>
+                    <button type="button" class="pin-btn" @onclick="() => AddPin('6')">6</button>
+                    
+                    <button type="button" class="pin-btn" @onclick="() => AddPin('7')">7</button>
+                    <button type="button" class="pin-btn" @onclick="() => AddPin('8')">8</button>
+                    <button type="button" class="pin-btn" @onclick="() => AddPin('9')">9</button>
+                    
+                    <button type="button" class="pin-btn clear-btn" @onclick="ClearPin">Clear</button>
+                    <button type="button" class="pin-btn" @onclick="() => AddPin('0')">0</button>
+                    <button type="button" class="pin-btn backspace-btn" @onclick="BackspacePin">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                            <line x1="18" y1="9" x2="12" y2="15"></line>
+                            <line x1="12" y1="9" x2="18" y2="15"></line>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+
+            <NavLink class="signup-link" href="/signup" Match="NavLinkMatch.All">
+                <span class="signup-link-text">Don't have an account? Sign Up</span>
+            </NavLink>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string username = string.Empty;
+    private string pin = string.Empty;
+
+    private void AddPin(char digit)
+    {
+        if (pin.Length < 6)
+        {
+            pin += digit;
+            if (pin.Length == 6)
+            {
+                _ = LoginUser();
+            }
+        }
+    }
+
+    private void ClearPin()
+    {
+        pin = string.Empty;
+    }
+
+    private void BackspacePin()
+    {
+        if (pin.Length > 0)
+        {
+            pin = pin.Substring(0, pin.Length - 1);
+        }
+    }
+
+    private void ToggleTheme() => ThemeService.ToggleTheme();
+
+    private string GetThemeClass() =>
+        ThemeService.GetCurrentTheme() == ThemeService.Theme.Light ? "light-theme" : "dark-theme";
+
+    private async Task LoginUser()
+    {
+        if (ValidationUtils.IsBlank([username, pin]))
+        {
+            Toast.Error("Please enter both username and PIN.");
+            return;
+        }
+
+        if (pin.Length != 6)
+        {
+            Toast.Error("PIN must be 6 digits.");
+            return;
+        }
+
+        Toast.Info("Please wait...");
+        var loginResult = await AuthService.Login(username, pin);
+
+        if (loginResult.Success)
+        {
+            Toast.Success("Logged in successfully!");
+            await Task.Delay(800);
+            Nav.NavigateTo("/dashboard", replace: true);
+        }
+        else
+        {
+            Toast.Error($"{loginResult.ErrorMessage ?? "Log in failed."}");
+            ClearPin();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        ThemeService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnChange -= StateHasChanged;
+    }
+}
