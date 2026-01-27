@@ -1,8 +1,8 @@
-﻿@page "/dashboard"
+﻿@page "/daily_journal"
 @using Serene.Entities
 @using Serene.Services
 @using System.Text.RegularExpressions
-@* @inject IJournalService JournalService *@
+@inject IJournalService JournalService
 @inject IJSRuntime JS
 @inject ToastService Toast
 @implements IDisposable
@@ -99,23 +99,17 @@
             //checking if today has an entry already
             try
             {
-                // var existing = await JournalService.GetTodayEntryAsync();
-                // if (existing != null)
-                // {
-                //     entry = existing;
-                //     selectedSecondaryMoodList = entry.SecondaryMoods.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
-                //     await JS.InvokeVoidAsync("setQuillHtml", entry.ContentHtml);
-                // }
+                var existing = await JournalService.GetTodayEntryAsync();
+                if (existing != null)
+                {
+                    entry = existing;
+                    selectedSecondaryMoodList = entry.SecondaryMoods.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+                    await JS.InvokeVoidAsync("setQuillHtml", entry.ContentHtml);
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("******************************************************************************");
-                Console.WriteLine("******************************************************************************");
-                Console.WriteLine("******************************************************************************");
                 Console.WriteLine(ex);
-                Console.WriteLine("******************************************************************************");
-                Console.WriteLine("******************************************************************************");
-                Console.WriteLine("******************************************************************************");
             }
             //setting up change listener for word count
             objRef = DotNetObjectReference.Create(this);
@@ -185,17 +179,11 @@
         //persisting to SQLite
         try
         {
-            // await JournalService.UpsertEntryAsync(entry);
+            await JournalService.UpsertEntryAsync(entry);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("******************************************************************************");
-            Console.WriteLine("******************************************************************************");
-            Console.WriteLine("******************************************************************************");
             Console.WriteLine(ex);
-            Console.WriteLine("******************************************************************************");
-            Console.WriteLine("******************************************************************************");
-            Console.WriteLine("******************************************************************************");
         }
     Toast.Success("Journal entry saved!");
     }
@@ -205,17 +193,11 @@
         //clearing the entry
         try
         {
-            // await JournalService.DeleteEntryAsync(entry.Id);
+            await JournalService.DeleteEntryAsync(entry.Id);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("******************************************************************************");
-            Console.WriteLine("******************************************************************************");
-            Console.WriteLine("******************************************************************************");
             Console.WriteLine(ex);
-            Console.WriteLine("******************************************************************************");
-            Console.WriteLine("******************************************************************************");
-            Console.WriteLine("******************************************************************************");
         }
         entry = new();
         selectedSecondaryMoodList.Clear();

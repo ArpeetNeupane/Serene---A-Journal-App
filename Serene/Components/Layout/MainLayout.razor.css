@@ -1,11 +1,69 @@
 .page {
-    position: relative;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 260px;
+    background-color: #0F172A; /* Dark navy from your screenshot */
+    height: 100%;
+    flex-shrink: 0;
+    z-index: 100;
 }
 
 main {
-    flex: 1;
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.content {
+    padding: 2rem;
+}
+
+/* Ensuring the sidebar is ALWAYS visible on Desktop/Tablet */
+::deep .nav-scrollable {
+    display: block !important;
+}
+
+/* Dashboard specific styles */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+    .stat-card label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #94a3b8;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+.text-blue {
+    color: #3b82f6;
+}
+
+.text-green {
+    color: #10b981;
+}
+
+.text-red {
+    color: #ef4444;
 }
 
 .top-row {

@@ -3,6 +3,27 @@
     background-color: rgba(0,0,0,0.4);
 }
 
+.logo {
+    width: 140px; /* Adjust based on your actual logo aspect ratio */
+    height: auto;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    display: block;
+}
+
+.nav-item-img {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    /* This helps if your icons are dark and need to be visible on dark background */
+    filter: brightness(0) invert(1);
+}
+
+.nav-item-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
 .navbar-brand {
     font-size: 1.1rem;
 }
@@ -62,7 +83,7 @@
         }
 
 .nav-scrollable {
-    display: none;
+    display: block;
 }
 
 .navbar-toggler:checked ~ .nav-scrollable {

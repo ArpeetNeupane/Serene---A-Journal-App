@@ -7,7 +7,5 @@ public interface IAuthService
     Task<ServiceResult<object?>> Logout();  //returns null that's why it's type is object?
     UserViewModel? GetCurrentUser();
 
-    //Task RefreshUser();
-
     public event Action? OnChange;
 }

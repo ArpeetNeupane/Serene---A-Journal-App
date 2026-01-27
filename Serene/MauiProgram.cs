@@ -20,7 +20,7 @@ namespace Serene
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
-            // Registering AppDbContext for DI
+            //registering AppDbContext for DI
             builder.Services.AddDbContext<AppDbContext>();
             builder.Services.AddBlazorWebViewDeveloperTools();
             builder.Services.AddSonner();
