@@ -129,7 +129,7 @@
         if (loginResult.Success)
         {
             Toast.Success("Logged in successfully!");
-            await Task.Delay(800);
+            await Task.Delay(500);
             Nav.NavigateTo("/dashboard", replace: true);
         }
         else

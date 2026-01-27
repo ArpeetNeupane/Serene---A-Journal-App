@@ -8,6 +8,7 @@
     height: auto;
     margin-top: 20px;
     margin-bottom: 30px;
+    margin-left: 35px;
     display: block;
 }
 
@@ -15,7 +16,6 @@
     width: 20px;
     height: 20px;
     margin-right: 12px;
-    /* This helps if your icons are dark and need to be visible on dark background */
     filter: brightness(0) invert(1);
 }
 
@@ -73,12 +73,12 @@
     }
 
         .nav-item ::deep a.active {
-            background-color: var(--selected-tab);
+            background-color: #1F2999;
             color: white;
         }
 
         .nav-item ::deep a:hover {
-            background-color: var(--hovered-tab);
+            background-color: #1F2937;
             color: white;
         }
 
