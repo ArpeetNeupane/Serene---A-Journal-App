@@ -75,6 +75,14 @@ namespace Serene.Services
 
             return await query.OrderByDescending(e => e.EntryDate).ToListAsync();
         }
+
+        public async Task<List<DateTime>> GetEntryDatesAsync(int month, int year)
+        {
+            return await _context.JournalEntries
+                .Where(e => e.EntryDate.Month == month && e.EntryDate.Year == year)
+                .Select(e => e.EntryDate.Date)
+                .ToListAsync();
+        }
     }
 
 }
