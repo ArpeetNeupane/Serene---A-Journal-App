@@ -1,0 +1,227 @@
+﻿@page "/dashboard"
+@using Serene.Entities
+@using Serene.Services
+@using System.Text.RegularExpressions
+@* @inject IJournalService JournalService *@
+@inject IJSRuntime JS
+@inject ToastService Toast
+@implements IDisposable
+
+<div class="journal-view-container">
+    <div class="journal-entry-card">
+
+        <div class="entry-header">
+            <input type="text" @bind="entry.Title" class="title-ghost-input" placeholder="Give today a title..." />
+            <div class="entry-meta">
+                Created: @entry.CreatedAt.ToString("MMM dd, 2025 � hh:mm tt") | Last Updated: Just Now
+            </div>
+        </div>
+
+        <div class="mood-container-box">
+            <div class="mood-group">
+                <label class="group-label">Primary Mood (Required)</label>
+                <div class="pill-row">
+                    @foreach (var mood in primaryMoods)
+                    {
+                        <button class="mood-pill @(entry.PrimaryMood == mood ? "active" : "")"
+                                @onclick="() => entry.PrimaryMood = mood">
+                            @mood
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div class="mood-group mt-4">
+                @* adding significant space between mood types *@
+                <label class="group-label">Secondary Moods (Up to 2)</label>
+                <div class="pill-row">
+                    @foreach (var mood in secondaryMoods)
+                    {
+                        <button class="mood-pill @(selectedSecondaryMoodList.Contains(mood) ? "active" : "")"
+                                @onclick="() => ToggleSecondaryMood(mood)">
+                            @mood
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <label class="group-label">Category</label>
+                <select @bind="entry.Category" class="custom-select">
+                    <option value="Work">Work</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Health">Health</option>
+                    <option value="Fitness">Fitness</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="group-label">Tags</label>
+                <input type="text" @bind="tagInput" @onkeyup="HandleTagKey" class="custom-input" placeholder="Add tags (Enter to save)" />
+                <div class="tag-cloud mt-2">
+                    @foreach (var tag in entry.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        <span class="tag-item">#@tag <span class="tag-remove" @onclick="() => RemoveTag(tag)">�</span></span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="editor-container-box mt-4">
+            <div id="editor"></div>
+        </div>
+
+        <div class="entry-actions mt-4">
+            <button class="btn-outline-danger" @onclick="DeleteEntry">Delete Entry</button>
+            <button class="btn-primary-action" @onclick="SaveEntry">Save Today's Entry</button>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private JournalEntry entry = new();
+    private string tagInput = "";
+    private List<string> selectedSecondaryMoodList = new();
+    private DotNetObjectReference<DailyJournal>? objRef;
+
+    private readonly string[] primaryMoods = { "Happy", "Excited", "Calm", "Thoughtful", "Stressed", "Sad" };
+    private readonly string[] secondaryMoods = { "Grateful", "Relaxed", "Curious", "Bored", "Anxious" };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //initializing the quill editor
+            await JS.InvokeVoidAsync("initQuill", "editor");
+
+            //checking if today has an entry already
+            try
+            {
+                // var existing = await JournalService.GetTodayEntryAsync();
+                // if (existing != null)
+                // {
+                //     entry = existing;
+                //     selectedSecondaryMoodList = entry.SecondaryMoods.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+                //     await JS.InvokeVoidAsync("setQuillHtml", entry.ContentHtml);
+                // }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("******************************************************************************");
+                Console.WriteLine("******************************************************************************");
+                Console.WriteLine("******************************************************************************");
+                Console.WriteLine(ex);
+                Console.WriteLine("******************************************************************************");
+                Console.WriteLine("******************************************************************************");
+                Console.WriteLine("******************************************************************************");
+            }
+            //setting up change listener for word count
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("quillInterop.registerOnChange", objRef);
+
+            StateHasChanged();
+        }
+    }
+
+    [JSInvokable]
+    public void OnEditorChanged()
+    {
+        //doing this to keep track of state if needed, though we save on button click
+    }
+
+    private void SetPrimaryMood(string mood) => entry.PrimaryMood = mood;
+
+    private void ToggleSecondaryMood(string mood)
+    {
+        //handling the max 2 secondary moods rule
+        if (selectedSecondaryMoodList.Contains(mood))
+            selectedSecondaryMoodList.Remove(mood);
+        else if (selectedSecondaryMoodList.Count < 2)
+            selectedSecondaryMoodList.Add(mood);
+    }
+
+    private void HandleTagKey(KeyboardEventArgs e)
+    {
+        //adding tag on enter key
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(tagInput))
+        {
+            var cleanTag = tagInput.Trim().Replace(",", "");
+            var tags = entry.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+            if (!tags.Contains(cleanTag))
+            {
+                tags.Add(cleanTag);
+                entry.Tags = string.Join(",", tags);
+            }
+            tagInput = "";
+        }
+    }
+
+    private void RemoveTag(string tag)
+    {
+        var tags = entry.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+        tags.Remove(tag);
+        entry.Tags = string.Join(",", tags);
+    }
+
+    private async Task SaveEntry()
+    {
+        //validating required primary mood
+        if (string.IsNullOrEmpty(entry.PrimaryMood))
+        {
+            Toast.Error("Please select a primary mood before saving.");
+            return;
+        }
+
+        //fetching content and word count from JS
+        entry.ContentHtml = await JS.InvokeAsync<string>("getQuillHtml");
+        var text = await JS.InvokeAsync<string>("getQuillText");
+        entry.WordCount = string.IsNullOrWhiteSpace(text) ? 0 : Regex.Split(text, @"\s+").Length;
+
+        //storing moods
+        entry.SecondaryMoods = string.Join(",", selectedSecondaryMoodList);
+
+        //persisting to SQLite
+        try
+        {
+            // await JournalService.UpsertEntryAsync(entry);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("******************************************************************************");
+            Console.WriteLine("******************************************************************************");
+            Console.WriteLine("******************************************************************************");
+            Console.WriteLine(ex);
+            Console.WriteLine("******************************************************************************");
+            Console.WriteLine("******************************************************************************");
+            Console.WriteLine("******************************************************************************");
+        }
+    Toast.Success("Journal entry saved!");
+    }
+
+    private async Task DeleteEntry()
+    {
+        //clearing the entry
+        try
+        {
+            // await JournalService.DeleteEntryAsync(entry.Id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("******************************************************************************");
+            Console.WriteLine("******************************************************************************");
+            Console.WriteLine("******************************************************************************");
+            Console.WriteLine(ex);
+            Console.WriteLine("******************************************************************************");
+            Console.WriteLine("******************************************************************************");
+            Console.WriteLine("******************************************************************************");
+        }
+        entry = new();
+        selectedSecondaryMoodList.Clear();
+        await JS.InvokeVoidAsync("setQuillHtml", "");
+        Toast.Info("Entry deleted.");
+    }
+
+    public void Dispose() => objRef?.Dispose();
+}

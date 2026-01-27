@@ -27,6 +27,7 @@ namespace Serene
             builder.Services.AddSingleton<ThemeService>();
             builder.Services.AddSingleton<ILoggerService, LoggerService>();
             builder.Services.AddSingleton<IAuthService, AuthService>();
+            builder.Services.AddScoped<IJournalService,  JournalService>();
     		builder.Logging.AddDebug();
 #endif
             var app = builder.Build();

@@ -1,0 +1,263 @@
+.journal-page {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    color: var(--text);
+}
+
+.journal-view-container {
+    padding: 2.5rem;
+    background: transparent; /* inherits from main body */
+}
+
+/* wrapping the entire entry in a card like the image */
+.journal-entry-card {
+    background: var(--bg);
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.title-ghost-input {
+    border: none;
+    background: transparent;
+    font-size: 2.2rem;
+    font-weight: 700;
+    width: 100%;
+    color: var(--text);
+    outline: none;
+    margin-bottom: 0.5rem;
+}
+
+.entry-meta {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 2rem;
+}
+
+/* box for mood selection */
+.mood-container-box {
+    border: 1px solid rgba(128,128,128,0.15);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.group-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+    text-transform: none;
+}
+
+.pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.mood-pill {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 6px 18px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .mood-pill.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+.custom-select, .custom-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: white;
+}
+
+/* explicit border for the editor area */
+.editor-container-box {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 400px;
+}
+
+::deep .ql-toolbar.ql-snow {
+    border: none;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+::deep .ql-container.ql-snow {
+    border: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.tag-item {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-right: 6px;
+}
+
+.btn-primary-action {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.btn-outline-danger {
+    background: transparent;
+    border: 1px solid #fee2e2;
+    color: #ef4444;
+    padding: 12px 28px;
+    border-radius: 8px;
+    margin-right: 10px;
+}
+
+.journal-title-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text);
+    outline: none;
+    margin-bottom: 0.5rem;
+}
+
+.metadata {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+.section-card {
+    background: var(--bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.section-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.mood-pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.mood-pill {
+    background: var(--bg);
+    border: 1px solid rgba(128, 128, 128, 0.2);
+    color: var(--text);
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .mood-pill:hover {
+        background: var(--hover-bg);
+    }
+
+    .mood-pill.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+.journal-select, .journal-tag-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(128, 128, 128, 0.2);
+    background: var(--bg);
+    color: var(--text);
+}
+
+.tag-badge {
+    display: inline-block;
+    background: rgba(var(--primary-rgb), 0.1);
+    color: var(--primary);
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+.close-tag {
+    cursor: pointer;
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+/* Quill Editor Styles */
+.quill-editor-container {
+    height: 400px;
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 8px;
+    border: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+/* Customizing Quill for Dark Mode */
+::deep .ql-container.ql-snow {
+    border: none;
+    font-family: inherit;
+    font-size: 1.1rem;
+}
+
+::deep .ql-editor.ql-blank::before {
+    color: #888;
+}
+
+.footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.btn-save {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.btn-delete {
+    background: transparent;
+    border: 1px solid #ff4d4d;
+    color: #ff4d4d;
+    padding: 12px 24px;
+    border-radius: 8px;
+}
+
+    .btn-delete:hover {
+        background: #ff4d4d;
+        color: white;
+    }
