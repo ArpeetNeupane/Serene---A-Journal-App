@@ -21,4 +21,14 @@ public class AppDbContext : DbContext
     {
         optionsBuilder.UseSqlite($"Data Source={_dbPath}");
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        //enforcing that the database can never have two entries with the same EntryDate
+        modelBuilder.Entity<JournalEntry>()
+            .HasIndex(j => j.EntryDate)
+            .IsUnique();
+    }
 }

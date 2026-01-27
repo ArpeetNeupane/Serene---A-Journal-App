@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Serene.Data;
 using Serene.Entities;
-using System;
-using System.Threading.Tasks;
+using Serene.Services;
 
 namespace Serene.Services
 {
@@ -26,25 +25,6 @@ namespace Serene.Services
                 .FirstOrDefaultAsync(e => e.EntryDate.Date == date.Date);
         }
 
-        public async Task UpsertEntryAsync(JournalEntry entry)
-        {
-            var existing = await _context.JournalEntries
-                .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.Id == entry.Id || e.EntryDate.Date == entry.EntryDate.Date);
-
-            entry.UpdatedAt = DateTime.Now;
-
-            if (existing == null)
-                _context.JournalEntries.Add(entry);
-            else
-            {
-                entry.Id = existing.Id;
-                _context.JournalEntries.Update(entry);
-            }
-
-            await _context.SaveChangesAsync();
-        }
-
         public async Task DeleteEntryAsync(Guid id)
         {
             var entry = await _context.JournalEntries.FindAsync(id);
@@ -54,5 +34,47 @@ namespace Serene.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task UpsertEntryAsync(JournalEntry entry)
+        {
+            //stripping the time portion to ensure "2025-12-20 10:30" becomes "2025-12-20 00:00"
+            var targetDate = entry.EntryDate.Date;
+            entry.EntryDate = targetDate;
+
+            //checking if an entry already exists for this specific day
+            var existing = await _context.JournalEntries
+                .FirstOrDefaultAsync(e => e.EntryDate == targetDate);
+
+            if (existing == null)
+            {
+                //doing this if it's the first time saving today
+                _context.JournalEntries.Add(entry);
+            }
+            else
+            {
+                //doing this to update the existing entry instead of creating a duplicate
+                _context.Entry(existing).CurrentValues.SetValues(entry);
+                existing.UpdatedAt = DateTime.Now;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<JournalEntry>> GetFilteredEntriesAsync(string search, string mood, string tag)
+        {
+            var query = _context.JournalEntries.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+                query = query.Where(e => e.Title.Contains(search) || e.ContentHtml.Contains(search));
+
+            if (!string.IsNullOrWhiteSpace(mood) && mood != "All")
+                query = query.Where(e => e.PrimaryMood == mood);
+
+            if (!string.IsNullOrWhiteSpace(tag) && tag != "All")
+                query = query.Where(e => e.Tags.Contains(tag));
+
+            return await query.OrderByDescending(e => e.EntryDate).ToListAsync();
+        }
     }
+
 }
