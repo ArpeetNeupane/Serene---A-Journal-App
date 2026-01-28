@@ -1,6 +1,4 @@
 ﻿using Serene.Entities;
-using System;
-using System.Threading.Tasks;
 
 namespace Serene.Services
 {

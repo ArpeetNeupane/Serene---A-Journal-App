@@ -84,7 +84,12 @@
 </div>
 
 @code {
+    [Parameter] [SupplyParameterFromQuery] public string? date { get; set; }
+
     private JournalEntry entry = new();
+    private DateTime targetDate = DateTime.Today;
+    private bool _quillInitialized = false;
+
     private string tagInput = "";
     private List<string> selectedSecondaryMoodList = new();
     private DotNetObjectReference<DailyJournal>? objRef;
@@ -98,6 +103,7 @@
         {
             //initializing the quill editor
             await JS.InvokeVoidAsync("initQuill", "editor");
+            _quillInitialized = true;
 
             //checking if today has an entry already
             try
@@ -114,11 +120,51 @@
             {
                 Console.WriteLine(ex);
             }
+
             //setting up change listener for word count
             objRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("quillInterop.registerOnChange", objRef);
 
             StateHasChanged();
+        }
+    }
+
+    //This method runs every time the URL parameters change
+    protected override async Task OnParametersSetAsync()
+    {
+        //parsing the date from URL
+        if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out var parsedDate))
+        {
+            targetDate = parsedDate.Date;
+        }
+        else
+        {
+            targetDate = DateTime.Today;
+        }
+
+        //fetching the entry for the target date
+        var existing = await JournalService.GetEntryByDateAsync(targetDate);
+
+        if (existing != null)
+        {
+            entry = existing;
+            selectedSecondaryMoodList = entry.SecondaryMoods.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+        }
+        else
+        {
+            //creating a fresh entry for the selected date
+            entry = new JournalEntry
+            {
+                EntryDate = targetDate,
+                CreatedAt = targetDate == DateTime.Today ? DateTime.Now : targetDate //setting timestamp to the specific day
+            };
+            selectedSecondaryMoodList.Clear();
+        }
+
+        //if the editor is already ready, we need to update its content immediately
+        if (_quillInitialized)
+        {
+            await JS.InvokeVoidAsync("setQuillHtml", entry.ContentHtml);
         }
     }
 
