@@ -13,7 +13,11 @@
         <div class="entry-header">
             <input type="text" @bind="entry.Title" class="title-ghost-input" placeholder="Give today a title..." />
             <div class="entry-meta">
-                Created: @entry.CreatedAt.ToString("MMM dd, 2025 -- hh:mm tt")
+                <span>Created: @entry.CreatedAt.ToString("MMM dd, yyyy - hh:mm tt")</span>
+                @if (entry.UpdatedAt > entry.CreatedAt.AddSeconds(5))
+                {
+                    <span class="ms-3 text-muted">  ||  Last Edit: @entry.UpdatedAt.ToString("hh:mm tt")</span>
+                }
             </div>
         </div>
 

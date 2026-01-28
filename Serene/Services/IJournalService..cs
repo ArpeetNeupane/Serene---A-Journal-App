@@ -13,5 +13,10 @@ namespace Serene.Services
         Task UpsertEntryAsync(JournalEntry entry);
         Task<List<DateTime>> GetEntryDatesAsync(int month, int year);
         Task DeleteEntryAsync(Guid id);
+        Task<(List<JournalEntry> Entries, int TotalCount)> GetPaginatedEntriesAsync(
+            string search, string mood, string tag,
+            DateTime? startDate, DateTime? endDate,
+            int page, int pageSize
+        );
     }
 }

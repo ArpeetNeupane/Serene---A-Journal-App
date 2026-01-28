@@ -7,6 +7,43 @@ namespace Serene.Services
 {
     public class JournalService : IJournalService
     {
+        public async Task<(List<JournalEntry> Entries, int TotalCount)> GetPaginatedEntriesAsync(
+    string search, string mood, string tag,
+    DateTime? startDate, DateTime? endDate,
+    int page, int pageSize)
+        {
+            var query = _context.JournalEntries.AsQueryable();
+
+            //applying text search
+            if (!string.IsNullOrWhiteSpace(search))
+                query = query.Where(e => e.Title.Contains(search) || e.ContentHtml.Contains(search));
+
+            //applying mood filter
+            if (!string.IsNullOrWhiteSpace(mood) && mood != "All")
+                query = query.Where(e => e.PrimaryMood == mood);
+
+            //applying tag filter
+            if (!string.IsNullOrWhiteSpace(tag) && tag != "All")
+                query = query.Where(e => e.Tags.Contains(tag));
+
+            //Filtering by Date Range
+            if (startDate.HasValue)
+                query = query.Where(e => e.EntryDate >= startDate.Value.Date);
+
+            if (endDate.HasValue)
+                query = query.Where(e => e.EntryDate <= endDate.Value.Date);
+
+            int totalCount = await query.CountAsync();
+
+            var entries = await query
+                .OrderByDescending(e => e.EntryDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (entries, totalCount);
+        }
+
         private readonly AppDbContext _context;
 
         public JournalService(AppDbContext context)
@@ -47,14 +84,20 @@ namespace Serene.Services
 
             if (existing == null)
             {
-                //doing this if it's the first time saving today
+                //making sure creating 1 a day is implemented
+                entry.CreatedAt = DateTime.Now; //system Timestamp
+                entry.UpdatedAt = DateTime.Now;
                 _context.JournalEntries.Add(entry);
             }
             else
             {
                 //doing this to update the existing entry instead of creating a duplicate
+                //updating the content but keep the original CreatedAt timestamp
+                entry.Id = existing.Id;
+                entry.CreatedAt = existing.CreatedAt;
+                entry.UpdatedAt = DateTime.Now;
+
                 _context.Entry(existing).CurrentValues.SetValues(entry);
-                existing.UpdatedAt = DateTime.Now;
             }
 
             await _context.SaveChangesAsync();
