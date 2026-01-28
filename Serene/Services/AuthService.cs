@@ -5,6 +5,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Serene.Services;
 
+
+/// <summary>
+/// Provides authentication functionality for the Serene application, including
+/// login, signup, logout, and tracking the currently logged-in user.
+/// </summary>
+/// <remarks>
+/// This service interacts with the database to validate user credentials,
+/// securely hashes and verifies PINs using BCrypt, and maintains the
+/// current user state. It also exposes an <see cref="OnChange"/> event
+/// to notify subscribers whenever the authentication state changes.
+/// </remarks>
 public class AuthService : IAuthService
 {
     public UserViewModel? CurrentUser { get; set; }

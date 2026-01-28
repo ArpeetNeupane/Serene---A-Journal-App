@@ -1,5 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 
+
+/// <summary>
+/// Provides logging functionality for the Serene application.
+/// </summary>
+/// <remarks>
+/// This service wraps the built-in Microsoft.Extensions.Logging functionality
+/// and exposes methods to log informational messages, warnings, and errors.
+/// The <see cref="LogError"/> method optionally accepts an Exception object
+/// for detailed error logging. It can be used throughout the application
+/// to standardize and centralize logging.
+/// </remarks>
 namespace Serene.Services
 {
     public interface ILoggerService 

@@ -1,16 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Serene.Data;
 using Serene.Entities;
-using Serene.Services;
 
+
+/// <summary>
+/// Provides CRUD operations and querying capabilities for journal entries
+/// within the Serene application.
+/// </summary>
+/// <remarks>
+/// This service handles retrieval, creation, updating, and deletion of
+/// journal entries. It supports filtered and paginated queries, date-based
+/// retrieval (e.g., today's entry), tag management, and ensures that only
+/// one entry per day is maintained. All database operations are performed
+/// asynchronously using Entity Framework Core.
+/// </remarks>
 namespace Serene.Services
 {
     public class JournalService : IJournalService
     {
         public async Task<(List<JournalEntry> Entries, int TotalCount)> GetPaginatedEntriesAsync(
-    string search, string mood, string tag,
-    DateTime? startDate, DateTime? endDate,
-    int page, int pageSize)
+            string search, string mood, string tag,
+            DateTime? startDate, DateTime? endDate,
+            int page, int pageSize)
         {
             var query = _context.JournalEntries.AsQueryable();
 

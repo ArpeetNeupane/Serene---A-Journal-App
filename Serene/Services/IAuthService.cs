@@ -1,5 +1,7 @@
 ﻿using Serene.Common;
 
+
+//interface for AuthService
 public interface IAuthService
 {
     Task<ServiceResult<LoginResponse>> Login(string email, string pin);

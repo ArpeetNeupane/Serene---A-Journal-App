@@ -129,7 +129,7 @@
         }
     }
 
-    //This method runs every time the URL parameters change
+    //this method runs every time the URL parameters change
     protected override async Task OnParametersSetAsync()
     {
         //parsing the date from URL
@@ -171,7 +171,7 @@
     [JSInvokable]
     public void OnEditorChanged()
     {
-        //doing this to keep track of state if needed, though we save on button click
+        //doing this to keep track of state if needed, even though we save on button click
     }
 
     private void SetPrimaryMood(string mood) => entry.PrimaryMood = mood;

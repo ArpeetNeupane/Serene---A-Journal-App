@@ -9,6 +9,7 @@
 @layout Layout.AuthLayout
 
 <div class="login-page @GetThemeClass()">
+    <!-- //applying light/dark theme dynamically -->
     <div class="login-bg-blur"></div>
     
     <button class="theme-toggle-fixed" @onclick="ToggleTheme" aria-label="Toggle theme">
@@ -124,13 +125,13 @@
         }
 
         Toast.Info("Please wait...");
-        var loginResult = await AuthService.Login(username, pin);
+        var loginResult = await AuthService.Login(username, pin); //authenticating user credentials
 
         if (loginResult.Success)
         {
             Toast.Success("Logged in successfully!");
-            await Task.Delay(500);
-            Nav.NavigateTo("/dashboard", replace: true);
+            await Task.Delay(500); //waiting for .5 secs
+            Nav.NavigateTo("/dashboard", replace: true); //redirecting after successful login
         }
         else
         {

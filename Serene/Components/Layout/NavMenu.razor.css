@@ -108,7 +108,7 @@
 .overlay {
     position: fixed;
     inset: 0;
-    background: transparent; /* or rgba(0,0,0,0.2) if you want dim */
+    background: transparent;
     z-index: 999;
 }
 
@@ -150,7 +150,7 @@
         display: none;
     }
 
-    /* User Profile Section (bottom of sidebar) */
+    /* export Section (bottom of sidebar) */
     .user-profile {
         padding: 1rem;
         display: flex;

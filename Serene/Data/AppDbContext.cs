@@ -12,7 +12,7 @@ public class AppDbContext : DbContext
 
     public AppDbContext()
     {
-        // Path to store SQLite DB on device
+        //path to store SQLite DB on device
         var folder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         _dbPath = System.IO.Path.Combine(folder, "serene_database.db");
     }

@@ -1,5 +1,7 @@
 ﻿using Serene.Entities;
 
+
+//interface for JournalService
 namespace Serene.Services
 {
     public interface IJournalService

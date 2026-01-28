@@ -32,13 +32,13 @@ window.getQuillHtml = () => {
     return quill.root.innerHTML;
 };
 
-// try setting quill html until complete
+//try setting quill html until complete
 window.setQuillHtml = (html) => {
     const trySet = () => {
         if (quill && quill.root) {
             quill.root.innerHTML = html ?? "";
         } else {
-            // Quill not ready yet → retry
+            //quill not ready yet → retry
             setTimeout(trySet, 50);
         }
     };

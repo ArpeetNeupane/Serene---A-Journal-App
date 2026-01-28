@@ -22,7 +22,7 @@ main {
     padding: 1rem;
 }
 
-/* Ensuring the sidebar is ALWAYS visible on Desktop/Tablet */
+/* Ensuring the sidebar is ALWAYS */
 ::deep .nav-scrollable {
     display: block !important;
 }

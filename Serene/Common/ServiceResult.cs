@@ -1,5 +1,6 @@
 ﻿namespace Serene.Common;
 
+//helper class for output results of a service
 public class ServiceResult<T>
 {
     public bool Success { get; set; }

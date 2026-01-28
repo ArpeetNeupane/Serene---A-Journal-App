@@ -133,7 +133,7 @@
 ::deep .ql-toolbar.ql-snow {
     border: none;
     border-bottom: 1px solid rgba(128, 128, 128, 0.2);
-    background: var(--hover-bg); /* slightly different color for toolbar */
+    background: var(--hover-bg);
 }
 
 ::deep .ql-container.ql-snow {
