@@ -7,6 +7,7 @@ namespace Serene.Services
     public interface IJournalService
     {
         Task<JournalEntry?> GetTodayEntryAsync();
+        Task<List<string>> GetAllUniqueTagsAsync();
         Task<JournalEntry?> GetEntryByDateAsync(DateTime date);
         Task<List<JournalEntry>> GetFilteredEntriesAsync(string search, string mood, string tag);
         Task UpsertEntryAsync(JournalEntry entry);

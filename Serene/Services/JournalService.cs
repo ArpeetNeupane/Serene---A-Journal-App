@@ -83,6 +83,22 @@ namespace Serene.Services
                 .Select(e => e.EntryDate.Date)
                 .ToListAsync();
         }
+
+        public async Task<List<string>> GetAllUniqueTagsAsync()
+        {
+            var allTagsStrings = await _context.JournalEntries
+                .Where(e => !string.IsNullOrEmpty(e.Tags))
+                .Select(e => e.Tags)
+                .ToListAsync();
+
+            //splitting comma-separated strings and getting unique values
+            return allTagsStrings
+                .SelectMany(t => t.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                .Select(t => t.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(t => t)
+                .ToList();
+        }
     }
 
 }
