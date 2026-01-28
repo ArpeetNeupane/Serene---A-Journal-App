@@ -1,0 +1,165 @@
+@page "/timeline"
+@using Serene.Entities
+@using Serene.Services
+@using System.Text.RegularExpressions;
+
+@inject IJournalService JournalService
+@inject NavigationManager Nav
+
+<div class="timeline-container">
+    <div class="timeline-header">
+        <p class="t-h">Timeline</p>
+        <div class="filter-bar">
+            <input type="text" @bind="searchTerm" @bind:event="oninput" @onkeyup="LoadEntries"
+                   placeholder="Search entries by title or content..." class="search-input" />
+
+            @* Date Range Filters *@
+            <div class="date-filters">
+                <input type="date" @bind="filterStart" @bind:after="OnFilterChange" class="filter-date" />
+                <span class="mx-2">to</span>
+                <input type="date" @bind="filterEnd" @bind:after="OnFilterChange" class="filter-date" />
+            </div>
+
+            <select @bind="selectedMood" @bind:after="LoadEntries" class="filter-select">
+                <option value="All">Mood: All</option>
+                @foreach (var m in moods)
+                {
+                    <option value="@m">@m</option>
+                }
+            </select>
+
+            <select @bind="selectedTag" @bind:after="LoadEntries" class="filter-select">
+                <option value="All">Tag: All</option>
+                @foreach (var tag in availableTags)
+                {
+                    <option value="@tag">#@tag</option>
+                }
+            </select>
+
+            <button class="btn-clear" @onclick="ClearFilters">Reset</button>
+        </div>
+    </div>
+
+    <div class="entry-list mt-4">
+        @if (entries == null)
+        {
+            <p>Loading entries...</p>
+        }
+        else if (!entries.Any())
+        {
+            <div class="empty-state">
+                <p>No entries found matching your search.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var entry in entries)
+            {
+                <div class="timeline-card" @onclick="() => EditEntry(entry.EntryDate)">
+                    <div class="card-indicator" style="background-color: @GetMoodColor(entry.PrimaryMood)"></div>
+                    <div class="card-body">
+                        <div class="card-header">
+                            <h3>@entry.Title</h3>
+                            <span class="date">@entry.EntryDate.ToString("MMM dd, yyyy")</span>
+                        </div>
+                        <p class="preview">@GetPreview(entry.ContentHtml)</p>
+                        <div class="tag-row">
+                            @foreach (var tag in entry.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                            {
+                                <span class="tag-badge">#@tag</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    @* Pagination Controls *@
+    <div class="pagination-footer d-flex justify-content-between align-items-center mt-5">
+        <button class="btn-nav" @onclick="PreviousPage" disabled="@(currentPage == 1)">
+            &larr; Previous
+        </button>
+        
+        <span class="page-indicator">Page @currentPage of @TotalPages</span>
+
+        <button class="btn-nav" @onclick="NextPage" disabled="@(currentPage >= TotalPages)">
+            Next &rarr;
+        </button>
+    </div>
+</div>
+
+@code {
+    private List<JournalEntry>? entries;
+    private int currentPage = 1;
+    private int pageSize = 5; //showing 5 entries per page
+    private int totalEntries = 0;
+
+    private DateTime? filterStart;
+    private DateTime? filterEnd;
+
+    private int TotalPages => (int)Math.Ceiling((double)totalEntries / pageSize);
+
+    private List<string> availableTags = new(); //storing the list for the dropdown
+
+    private string searchTerm = "";
+    private string selectedMood = "All";
+    private string selectedTag = "All";
+    private string[] moods = { "Happy", "Excited", "Calm", "Thoughtful", "Stressed", "Sad" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        availableTags = await JournalService.GetAllUniqueTagsAsync();
+        await LoadEntries();
+    }
+
+    private async Task LoadEntries()
+    {
+        //fetching the specific page of data
+        var result = await JournalService.GetPaginatedEntriesAsync(
+            searchTerm, selectedMood, selectedTag, filterStart, filterEnd, currentPage, pageSize
+        );
+
+        entries = result.Entries;
+        totalEntries = result.TotalCount;
+    }
+
+    private async Task ClearFilters()
+    {
+        searchTerm = "";
+        selectedMood = "All";
+        selectedTag = "All";
+        filterStart = null;
+        filterEnd = null;
+        currentPage = 1;
+        await LoadEntries();
+    }
+
+    private async Task NextPage() { currentPage++; await LoadEntries(); }
+    private async Task PreviousPage() { currentPage--; await LoadEntries(); }
+
+    //resetting page to 1 whenever filters change
+    private async Task OnFilterChange() { currentPage = 1; await LoadEntries(); }
+
+    private void EditEntry(DateTime date)
+    {
+        //we can pass the date to the journal page to load that specific day
+        Nav.NavigateTo($"/daily_journal?date={date:yyyy-MM-dd}");
+    }
+
+    private string GetPreview(string html)
+    {
+        //simple regex to strip html tags for the preview text
+        var plainText = Regex.Replace(html, "<[^>]+>", string.Empty);
+        return plainText.Length > 150 ? plainText.Substring(0, 147) + "..." : plainText;
+    }
+
+    private string GetMoodColor(string mood) => mood switch
+    {
+        "Happy" => "#10b981",
+        "Calm" => "#3b82f6",
+        "Stressed" => "#f59e0b",
+        "Sad" => "#ef4444",
+        _ => "#94a3b8"
+    };
+}

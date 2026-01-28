@@ -1,0 +1,119 @@
+@page "/dashboard"
+@inject IStreakService StreakService
+@inject IAnalyticsService AnalyticsService
+@inject IAuthService AuthService
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<div class="dashboard-container">
+    <div class="top-header">
+        <div class="title-group">
+            <h1>Overview</h1>
+            <p>Personal growth and mood analytics</p>
+        </div>
+        <div class="user-actions">
+            <span class="username">@AuthService.GetCurrentUser()?.Username</span>
+            <button class="logout-btn" @onclick="Logout">Logout</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <label>DAILY STREAK</label>
+            <h2 class="text-blue">@stats.Current Days</h2>
+        </div>
+        <div class="stat-card">
+            <label>LONGEST STREAK</label>
+            <h2 class="text-green">@stats.Longest Days</h2>
+        </div>
+        <div class="stat-card">
+            <label>MISSED DAYS</label>
+            <h2 class="text-red">@stats.Missed</h2>
+        </div>
+        <div class="stat-card">
+            <label>AVG. WORD COUNT</label>
+            <h2>@avgWords</h2>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="chart-box">
+            <h3>Word Count Trends (Daily)</h3>
+            <div class="canvas-wrapper">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-box">
+            <h3>Top 10 Used Words</h3>
+            <div class="canvas-wrapper">
+                <canvas id="wordsBarChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-box">
+            <h3>Mood Distribution</h3>
+            <div class="canvas-wrapper pie-wrapper">
+                <canvas id="moodPieChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-box">
+            <h3>Most Used Tags</h3>
+            <div class="tag-flex">
+                @if (mostUsedTags != null && mostUsedTags.Any())
+                {
+                    @foreach (var tagData in mostUsedTags)
+                    {
+                        <span class="tag-pill">#@tagData.Tag (@tagData.Count)</span>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">No tags used yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private (int Current, int Longest, int Missed) stats;
+    private int avgWords = 0;
+    private List<(string Tag, int Count)> mostUsedTags = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        stats = await StreakService.GetStreakStatsAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //loading the average word count
+            avgWords = await AnalyticsService.GetAverageWordCountAsync();
+
+            //getting other stats like mood, word trends
+            var moodData = await AnalyticsService.GetMoodDistributionAsync();
+            var trends = await AnalyticsService.GetDailyWordCountTrendsAsync();
+            var topWords = await AnalyticsService.GetTopUsedWordsAsync(10);
+            mostUsedTags = await AnalyticsService.GetMostUsedTagsAsync(6);
+
+            await JS.InvokeVoidAsync("renderDashboardCharts",
+                moodData,
+                trends.Select(t => t.Date).ToList(),
+                trends.Select(t => t.Count).ToList(),
+                topWords.Select(w => w.Word).ToList(),
+                topWords.Select(w => w.Count).ToList());
+
+            StateHasChanged();
+        }
+    }
+
+    private void Logout()
+    {
+        AuthService.Logout();
+        Nav.NavigateTo("/login", true);
+    }
+}

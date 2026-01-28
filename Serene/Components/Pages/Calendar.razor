@@ -1,0 +1,107 @@
+@page "/calendar"
+@using Serene.Services
+@inject IJournalService JournalService
+@inject NavigationManager Nav
+@inject ToastService Toast
+
+<div class="calendar-wrapper">
+    <div class="calendar-header">
+        <h1>@currentDate.ToString("MMMM yyyy")</h1>
+        <div class="calendar-nav">
+            <button class="nav-btn" @onclick="PreviousMonth">&lt;</button>
+            <button class="nav-btn" @onclick="NextMonth">&gt;</button>
+        </div>
+    </div>
+
+    <div class="calendar-grid">
+        @* Headers *@
+        <div class="day-label">SUN</div>
+        <div class="day-label">MON</div>
+        <div class="day-label">TUE</div>
+        <div class="day-label">WED</div>
+        <div class="day-label">THU</div>
+        <div class="day-label">FRI</div>
+        <div class="day-label">SAT</div>
+
+        @foreach (var day in daysToDisplay)
+        {
+            var isCurrentMonth = day.Month == currentDate.Month;
+            var hasEntry = entryDates.Contains(day.Date);
+            var isPast = day.Date < DateTime.Today;
+            var isToday = day.Date == DateTime.Today;
+
+            <div class="calendar-cell @(isCurrentMonth ? "" : "other-month") @(isToday ? "today-cell" : "")"
+                 @onclick="() => NavigateToEntry(day, hasEntry)">
+
+                <span class="day-number">@day.Day</span>
+
+                @if (isCurrentMonth)
+                {
+                    @if (hasEntry)
+                    {
+                        //showing green dot for maintained days
+                        <div class="status-dot dot-green" title="Maintained"></div>
+                    }
+                    else if (isPast)
+                    {
+                        //showing red dot for missed days in the past
+                        <div class="status-dot dot-red" title="Missed"></div>
+                    }
+                }
+
+                @if (isToday)
+                {
+                    <span class="today-tag">Today</span>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private DateTime currentDate = DateTime.Today;
+    private List<DateTime> daysToDisplay = new();
+    private List<DateTime> entryDates = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCalendarData();
+    }
+
+    private async Task LoadCalendarData()
+    {
+        daysToDisplay.Clear();
+
+        //getting the first day of the current month
+        var firstOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+        var startOffset = (int)firstOfMonth.DayOfWeek;
+
+        //calculating the start of the grid (including previous month padding)
+        var startDate = firstOfMonth.AddDays(-startOffset);
+
+        //filling 42 cells (6 rows of 7 days) to keep the grid consistent
+        for (int i = 0; i < 42; i++)
+        {
+            daysToDisplay.Add(startDate.AddDays(i));
+        }
+
+        entryDates = await JournalService.GetEntryDatesAsync(currentDate.Month, currentDate.Year);
+    }
+
+    private async Task PreviousMonth() { currentDate = currentDate.AddMonths(-1); await LoadCalendarData(); }
+    private async Task NextMonth() { currentDate = currentDate.AddMonths(1); await LoadCalendarData(); }
+
+    private void NavigateToEntry(DateTime date, bool hasEntry)
+    {
+        //allowing clicking ONLY if it's today OR if a past entry exists
+        if (date.Date == DateTime.Today || hasEntry)
+        {
+            Nav.NavigateTo($"/daily_journal?date={date:yyyy-MM-dd}");
+        }
+        else
+        {
+            //showing a toast if the user tries to click a missed past day or future day
+            Toast.Info("No entry exists for this date.");
+        }
+    }
+}

@@ -1,0 +1,60 @@
+.export-container {
+    padding: 4rem;
+    display: flex;
+    justify-content: center;
+}
+
+.export-card {
+    margin-top: 130px;
+    background: var(--bg);
+    border: 1px solid rgba(128,128,128,0.3);
+    padding: 3rem;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.range-selector {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 35px;
+}
+
+.date-group {
+    text-align: left;
+    flex: 1;
+}
+
+    .date-group label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+.date-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-export {
+    width: 30%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+    .btn-export:disabled {
+        opacity: 0.6;
+    }

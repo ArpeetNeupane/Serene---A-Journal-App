@@ -1,0 +1,100 @@
+@page "/export"
+@using Serene.Services
+@using CommunityToolkit.Maui.Storage
+@inject IExportService ExportService
+@inject ToastService Toast
+
+<div class="export-container">
+    <div class="export-card">
+        <h1>Export Journals</h1>
+        <p>Save your memories as a high-quality PDF document.</p>
+        <br /><br />
+
+        <div class="range-selector mt-4">
+            <div class="date-group">
+                <label>Start Date</label>
+                <input type="date" @bind="startDate" class="date-input" />
+            </div>
+            <br />
+            <div class="date-group">
+                <label>End Date</label>
+                <input type="date" @bind="endDate" class="date-input" />
+            </div>
+        </div>
+
+        <button class="btn-export mt-4" @onclick="DownloadPdf" disabled="@isExporting">
+            @if (isExporting) { <span>Generating PDF...</span> }
+            else { <span>Download PDF Bundle</span> }
+        </button>
+    </div>
+</div>
+
+@code {
+    private DateTime startDate = DateTime.Today.AddMonths(-1);
+    private DateTime endDate = DateTime.Today;
+    private bool isExporting = false;
+
+    private async Task DownloadPdf()
+    {
+        if (endDate < startDate)
+        {
+            Toast.Error("End date cannot be before start date.");
+            return;
+        }
+
+        isExporting = true;
+        try
+        {
+            var pdfBytes = await ExportService.GeneratePdfExportAsync(startDate, endDate);
+
+            if (pdfBytes == null || pdfBytes.Length == 0)
+            {
+                Toast.Error("No entries found in this range.");
+                return;
+            }
+
+            string fileName = $"Serene_Journal_{DateTime.Now:yyyyMMdd}.pdf";
+
+            if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+            {
+                //finding the user's Downloads folder
+                string userPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string downloadsPath = Path.Combine(userPath, "Downloads");
+                string targetPath = Path.Combine(downloadsPath, fileName);
+
+                //writing the file directly
+                await File.WriteAllBytesAsync(targetPath, pdfBytes);
+
+                Toast.Success($"Saved to Downloads!");
+
+                //opening the folder so the user sees the file
+                await Launcher.Default.OpenAsync(new OpenFileRequest
+                {
+                    File = new ReadOnlyFile(targetPath)
+                });
+            }
+            //logic for phones
+            else
+            {
+                string targetFile = Path.Combine(FileSystem.CacheDirectory, fileName);
+                await File.WriteAllBytesAsync(targetFile, pdfBytes);
+
+                await Share.Default.RequestAsync(new ShareFileRequest
+                {
+                    Title = "Journal Export",
+                    File = new ShareFile(targetFile, "application/pdf")
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Toast.Error("Export failed. Check folder permissions.");
+            Console.WriteLine($"PDF ERROR: {ex.Message}");
+        }
+        finally
+        {
+            isExporting = false;
+            StateHasChanged();
+        }
+    }
+}
