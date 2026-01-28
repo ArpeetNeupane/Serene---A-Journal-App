@@ -81,15 +81,14 @@ public class AuthService : IAuthService
     //signup
     public async Task<ServiceResult<SignUpResponse>> SignUp(
         string username,
-        string pin,
-        string journalLockPin)
+        string pin)
     {
         try
         {
-            if (!IsValidPin(pin) || !IsValidPin(journalLockPin))
+            if (!IsValidPin(pin))
             {
                 return ServiceResult<SignUpResponse>.FailureResult(
-                    "PINs must be numeric and 6 digits long."
+                    "PIN must be numeric and 6 digits long."
                 );
             }
 
@@ -104,8 +103,7 @@ public class AuthService : IAuthService
             var user = new User
             {
                 Username = username,
-                PIN = BCrypt.Net.BCrypt.HashPassword(pin),
-                JournalPin = BCrypt.Net.BCrypt.HashPassword(journalLockPin)
+                PIN = BCrypt.Net.BCrypt.HashPassword(pin)
             };
 
             _context.Users.Add(user);

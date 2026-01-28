@@ -1,16 +1,13 @@
 .page {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
 }
 
 .sidebar {
-    width: 260px;
-    background-color: #0F172A; /* Dark navy from your screenshot */
-    height: 100%;
-    flex-shrink: 0;
+    background-color: #0F172A;
     z-index: 100;
 }
 
@@ -22,7 +19,7 @@ main {
 }
 
 .content {
-    padding: 2rem;
+    padding: 1rem;
 }
 
 /* Ensuring the sidebar is ALWAYS visible on Desktop/Tablet */
@@ -90,42 +87,33 @@ main {
             text-overflow: ellipsis;
         }
 
-@media (max-width: 640.98px) {
-    .top-row {
-        justify-content: space-between;
-    }
-
-        .top-row ::deep a, .top-row ::deep .btn-link {
-            margin-left: 0;
-        }
-}
-
 @media (min-width: 641px) {
     .page {
         flex-direction: row;
     }
 
     .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
+        width: 260px;
+        height: 100%;
+        flex-shrink: 0;
     }
 
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
+    .content {
+        padding: 2.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
     }
 
-        .top-row.auth ::deep a:first-child {
-            flex: 1;
-            text-align: right;
-            width: 0;
-        }
+    ::deep .nav-scrollable {
+        display: none;
+    }
 
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
+    ::deep .navbar-toggler:checked ~ .nav-scrollable {
+        display: block;
     }
 }

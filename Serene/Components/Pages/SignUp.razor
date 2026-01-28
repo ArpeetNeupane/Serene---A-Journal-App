@@ -67,22 +67,6 @@
                     </div>
                 </div>
 
-                <div class="form-field">
-                    <div class="input-with-toggle">
-                        <input type="@(showJournalPin ? "text" : "password")"
-                               name="journalPin"
-                               id="journalPin"
-                               @bind="journalPin"
-                               placeholder="Journal PIN"
-                               maxlength="6"
-                               class="form-input" />
-                        <button type="button" class="toggle-pin-btn" @onclick="() => showJournalPin = !showJournalPin">
-                            @(showJournalPin ? "Hide" : "Show")
-                        </button>
-                    </div>
-                </div>
-
-
                 <button type="submit" class="signup-btn">Sign Up</button>
             </form>
 
@@ -97,11 +81,9 @@
     private string username = string.Empty;
     private string pin = string.Empty;
     private string confirmPin = string.Empty;
-    private string journalPin = string.Empty;
 
     private bool showPin;
     private bool showConfirmPin;
-    private bool showJournalPin;
 
     private void ToggleTheme() => ThemeService.ToggleTheme();
 
@@ -111,14 +93,14 @@
     private async Task SignUpUser()
     {
         //validating non-empty fields
-        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(pin) || string.IsNullOrWhiteSpace(confirmPin) || string.IsNullOrWhiteSpace(journalPin))
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(pin) || string.IsNullOrWhiteSpace(confirmPin))
         {
             Toast.Error("Please fill in all the fields.");
             return;
         }
 
         //validating numeric PIN
-        if (!pin.All(char.IsDigit) || pin.Length is not 6 || !journalPin.All(char.IsDigit) || journalPin.Length is not 6)
+        if (!pin.All(char.IsDigit) || pin.Length is not 6)
     {
             Toast.Error("PIN must be numeric and 6 digits long.");
             return;
@@ -131,16 +113,9 @@
             return;
         }
 
-        //validating journal PIN
-        if ((!journalPin.All(char.IsDigit) || journalPin.Length is not 6))
-        {
-            Toast.Error("Journal PIN must be numeric and 6 digits long.");
-            return;
-        }
-
         Toast.Info("Please wait while we create the account.");
         await Task.Delay(800);
-        var result = await AuthService.SignUp(username, pin, journalPin);
+        var result = await AuthService.SignUp(username, pin);
 
         if (result.Success)
         {
