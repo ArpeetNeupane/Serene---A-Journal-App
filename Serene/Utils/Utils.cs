@@ -9,13 +9,14 @@ public class ValidationUtils
         return string.IsNullOrWhiteSpace(value);
     }
 
-    // Overriding IsBlank to check multiple strings
+
+    //overload IsBlank to check multiple strings
     public static bool IsBlank(List<string> values)
     {
         if (values == null || values.Count == 0)
             return true; // treat null/empty list as blank
 
-        // Returns true if **any string is blank**
+        //returns true if **any string is blank**
         return values.Any(string.IsNullOrWhiteSpace);
     }
 }

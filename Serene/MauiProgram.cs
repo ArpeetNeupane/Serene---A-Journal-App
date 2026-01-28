@@ -28,7 +28,9 @@ namespace Serene
             builder.Services.AddSingleton<ILoggerService, LoggerService>();
             builder.Services.AddSingleton<IAuthService, AuthService>();
             builder.Services.AddScoped<IJournalService,  JournalService>();
-    		builder.Logging.AddDebug();
+            builder.Services.AddScoped<IStreakService, StreakService>();
+            builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+            builder.Logging.AddDebug();
 #endif
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())
