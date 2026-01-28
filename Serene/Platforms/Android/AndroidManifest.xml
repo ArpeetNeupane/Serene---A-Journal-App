@@ -1,8 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true"></application>
+    <application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon" android:supportsRtl="true"></application>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
+	<!-- adding queries so the Share sheet can find PDF viewers -->
+	<queries>
+		<intent>
+			<action android:name="android.intent.action.VIEW" />
+			<data android:mimeType="application/pdf" />
+		</intent>
+		<intent>
+			<action android:name="android.intent.action.SEND" />
+			<data android:mimeType="application/pdf" />
+		</intent>
+	</queries>
 
     <!-- adding permissions to save files -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
